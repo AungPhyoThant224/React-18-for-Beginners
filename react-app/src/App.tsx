@@ -1,4 +1,5 @@
 import { useState } from "react";
+import produce from "immer";
 
 function App() {
   const [bugs, setBug] = useState([
@@ -8,13 +9,27 @@ function App() {
 
   const handleClick = () => {
     //update
-    setBug(bugs.map((bug) => (bug.id === 1 ? { ...bug, fixed: true } : bug)));
+    // setBug(bugs.map((bug) => (bug.id === 1 ? { ...bug, fixed: true } : bug)));
+    setBug(
+      produce((draft) => {
+        let bug = draft.find((bug) => bug.id === 1);
+        if (bug) {
+          bug.fixed = true;
+        }
+      })
+    );
   };
 
   return (
     <div>
       <button onClick={handleClick}>My button</button>
-      <div>{bugs.map((bug) => bug.name)}</div>
+      <div>
+        {bugs.map((bug) => (
+          <p>
+            {bug.name} {bug.fixed ? "Fixed" : "New"}
+          </p>
+        ))}
+      </div>
     </div>
   );
 }
