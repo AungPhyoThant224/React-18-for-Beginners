@@ -1,14 +1,17 @@
-import Button from "./components/Button";
+import { useState } from "react";
+import Like from "./components/Like";
 
 function App() {
+  const [liked, setLike] = useState(false);
+
   function onClick() {
-    console.log("clicked");
+    setLike(!liked);
   }
 
   return (
-    <Button color="danger" onClick={onClick}>
-      My Button
-    </Button>
+    <div>
+      <Like onClick={onClick} liked={liked} />
+    </div>
   );
 }
 
