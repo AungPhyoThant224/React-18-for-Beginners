@@ -1,11 +1,15 @@
 import { useState } from "react";
 import produce from "immer";
-import Ecommerce from "./components/Ecommerce";
+import Game from "./components/GameExe";
+import Pizza from "./components/PizzaExe/Pizza";
+import Discount from "./components/Discount";
 
 function App() {
   return (
     <>
-      <Ecommerce />
+      <Game />
+      <Pizza></Pizza>
+      <Discount></Discount>
     </>
   );
 }
