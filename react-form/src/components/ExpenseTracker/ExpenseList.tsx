@@ -9,37 +9,31 @@ interface Props {
   }[];
   categories: string[];
   handleDelete: (id: number) => void;
+  handleFilter: (value: string) => void;
 }
 
-const ExpenseList = ({ items, categories, handleDelete }: Props) => {
-  const [filterItems, setFilterItems] = useState(items);
-
+const ExpenseList = ({
+  items,
+  categories,
+  handleDelete,
+  handleFilter,
+}: Props) => {
   let selectedFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectCategory = e.target.value;
-    if (selectCategory === "all") {
-      setFilterItems(items);
-    } else {
-      setFilterItems(items.filter((item) => item.category === selectCategory));
-    }
+    handleFilter(e.target.value);
   };
 
   const onClick = (id: number) => {
     handleDelete(id);
-    console.log(items.length);
-    setFilterItems(items);
-    console.log("done 2");
   };
 
   return (
     <>
-      <div>{items.length}</div>
-      <div>{filterItems.length}</div>
       <select
         onChange={selectedFilter}
         className="form-select"
         aria-label="Default select example"
       >
-        <option value={"all"}>All Categories</option>
+        <option value={""}>All Categories</option>
         {categories.map((item, index) => (
           <option key={index} value={item}>
             {item}
@@ -53,10 +47,11 @@ const ExpenseList = ({ items, categories, handleDelete }: Props) => {
             <th scope="col">Description</th>
             <th scope="col">Amount</th>
             <th scope="col">Category</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
-          {filterItems.map((item) => (
+          {items.map((item) => (
             <tr key={item.id}>
               <th scope="row">{item.id}</th>
               <td>{item.description}</td>
@@ -74,6 +69,15 @@ const ExpenseList = ({ items, categories, handleDelete }: Props) => {
             </tr>
           ))}
         </tbody>
+        <tfoot>
+          <tr>
+            <td></td>
+            <td>Total</td>
+            <td>${items.reduce((acc, item) => acc + item.amount, 0)}</td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tfoot>
       </table>
     </>
   );
