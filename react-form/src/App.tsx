@@ -1,10 +1,10 @@
 import React from "react";
-import Form from "./components/Form";
+import ExpenseTracker from "./components/ExpenseTracker";
 
 const App = () => {
   return (
     <div>
-      <Form></Form>
+      <ExpenseTracker></ExpenseTracker>
     </div>
   );
 };
