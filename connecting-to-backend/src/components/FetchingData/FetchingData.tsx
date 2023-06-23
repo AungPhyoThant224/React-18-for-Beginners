@@ -9,19 +9,23 @@ interface User {
 const FetchingData = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState("");
+  const [isLoading, setLoading] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
+    setLoading(true);
     axios
       .get("https://jsonplaceholder.typicode.com/users", {
         signal: controller.signal,
       })
       .then((res) => {
         setUsers(res.data);
+        setLoading(false);
       })
       .catch((e) => {
         if (e instanceof CanceledError) return;
         setError(e.message);
+        setLoading(false);
       });
 
     return () => controller.abort();
@@ -43,6 +47,8 @@ const FetchingData = () => {
   return (
     <>
       {error && <p className="text-danger">{error}</p>}
+      {isLoading && <div className="spinner-border"></div>}
+
       <ul>
         {users.map((user) => (
           <li key={user.id}>{user.name}</li>
