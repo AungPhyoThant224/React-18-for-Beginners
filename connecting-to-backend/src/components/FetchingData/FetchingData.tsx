@@ -1,4 +1,7 @@
-import axios, { AxiosError, CanceledError } from "axios";
+import apiClient, {
+  AxiosError,
+  CanceledError,
+} from "../../services/api-client";
 import { useEffect, useState } from "react";
 
 interface User {
@@ -14,8 +17,8 @@ const FetchingData = () => {
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
-    axios
-      .get("https://jsonplaceholder.typicode.com/users", {
+    apiClient
+      .get("/users", {
         signal: controller.signal,
       })
       .then((res) => {
@@ -47,12 +50,10 @@ const FetchingData = () => {
   const deleteUser = (user: User) => {
     const originalUser = users;
     setUsers(users.filter((u) => u.id !== user.id));
-    axios
-      .delete("https://jsonplaceholder.typicode.com/users/" + user.id)
-      .catch((e) => {
-        setError((e as AxiosError).message);
-        setUsers(originalUser);
-      });
+    apiClient.delete("/users/" + user.id).catch((e) => {
+      setError((e as AxiosError).message);
+      setUsers(originalUser);
+    });
   };
 
   const addUser = () => {
@@ -60,8 +61,8 @@ const FetchingData = () => {
     let newUser = { id: 0, name: "Mosh" };
     setUsers([...users, newUser]);
 
-    axios
-      .post("https://jsonplaceholder.typicode.com/users", newUser)
+    apiClient
+      .post("/users", newUser)
       .then(({ data: saveUser }) => setUsers([...users, saveUser]))
       .catch((e) => {
         setError((e as AxiosError).message);
@@ -74,15 +75,10 @@ const FetchingData = () => {
     let updatedUser = { ...user, name: user.name + "!" };
     setUsers(users.map((u) => (u.id === user.id ? updatedUser : u)));
 
-    axios
-      .patch(
-        "https://jsonplaceholder.typicode.com/users/" + user.id,
-        updateUser
-      )
-      .catch((e) => {
-        setError((e as AxiosError).message);
-        setUsers(originalUser);
-      });
+    apiClient.patch("/users/" + user.id, updateUser).catch((e) => {
+      setError((e as AxiosError).message);
+      setUsers(originalUser);
+    });
   };
 
   return (
