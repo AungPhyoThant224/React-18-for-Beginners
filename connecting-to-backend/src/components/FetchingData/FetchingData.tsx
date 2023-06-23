@@ -1,13 +1,6 @@
-import apiClient, {
-  AxiosError,
-  CanceledError,
-} from "../../services/api-client";
+import { AxiosError, CanceledError } from "../../services/api-client";
 import { useEffect, useState } from "react";
-
-interface User {
-  id: number;
-  name: String;
-}
+import userService, { User } from "../../services/user-service";
 
 const FetchingData = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -15,42 +8,26 @@ const FetchingData = () => {
   const [isLoading, setLoading] = useState(false);
 
   useEffect(() => {
-    const controller = new AbortController();
     setLoading(true);
-    apiClient
-      .get("/users", {
-        signal: controller.signal,
-      })
+    const { request, cancel } = userService.getAllUsers();
+    request
       .then((res) => {
         setUsers(res.data);
         setLoading(false);
       })
       .catch((e) => {
         if (e instanceof CanceledError) return;
-        setError(e.message);
+        setError((e as AxiosError).message);
         setLoading(false);
       });
 
-    return () => controller.abort();
-
-    // const fetchData = async () => {
-    //   try {
-    //     const res = await axios.get<User[]>(
-    //       "https://jsonplaceholder.typicode.com/users",
-
-    //     );
-    //     setUsers(res.data);
-    //   } catch (error) {
-    //     setError((error as AxiosError).message);
-    //   }
-    // };
-    // fetchData();
+    return () => cancel();
   }, []);
 
   const deleteUser = (user: User) => {
     const originalUser = users;
     setUsers(users.filter((u) => u.id !== user.id));
-    apiClient.delete("/users/" + user.id).catch((e) => {
+    userService.deleteUser(user.id).catch((e) => {
       setError((e as AxiosError).message);
       setUsers(originalUser);
     });
@@ -61,8 +38,8 @@ const FetchingData = () => {
     let newUser = { id: 0, name: "Mosh" };
     setUsers([...users, newUser]);
 
-    apiClient
-      .post("/users", newUser)
+    userService
+      .addUser(newUser)
       .then(({ data: saveUser }) => setUsers([...users, saveUser]))
       .catch((e) => {
         setError((e as AxiosError).message);
@@ -75,7 +52,7 @@ const FetchingData = () => {
     let updatedUser = { ...user, name: user.name + "!" };
     setUsers(users.map((u) => (u.id === user.id ? updatedUser : u)));
 
-    apiClient.patch("/users/" + user.id, updateUser).catch((e) => {
+    userService.updateUser(updatedUser).catch((e) => {
       setError((e as AxiosError).message);
       setUsers(originalUser);
     });
