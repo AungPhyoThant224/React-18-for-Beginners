@@ -44,14 +44,52 @@ const FetchingData = () => {
     // fetchData();
   }, []);
 
+  const deleteUser = (user: User) => {
+    const originalUser = users;
+    setUsers(users.filter((u) => u.id !== user.id));
+    axios
+      .delete("https://jsonplaceholder.typicode.com/users" + user.id)
+      .catch((e) => {
+        setError((e as AxiosError).message);
+        setUsers(originalUser);
+      });
+  };
+
+  const addUser = () => {
+    const originalUser = users;
+    let newUser = { id: 0, name: "Mosh" };
+    setUsers([...users, newUser]);
+
+    axios
+      .post("https://jsonplaceholder.typicode.com/users", newUser)
+      .then(({ data: saveUser }) => setUsers([...users, saveUser]))
+      .catch((e) => {
+        setError((e as AxiosError).message);
+        setUsers(originalUser);
+      });
+  };
+
   return (
     <>
       {error && <p className="text-danger">{error}</p>}
       {isLoading && <div className="spinner-border"></div>}
-
-      <ul>
+      <div className="btn btn-primary mb-3" onClick={() => addUser()}>
+        Add
+      </div>
+      <ul className="list-group">
         {users.map((user) => (
-          <li key={user.id}>{user.name}</li>
+          <li
+            key={user.id}
+            className="list-group-item d-flex justify-content-between"
+          >
+            {user.name}
+            <div
+              className="btn btn-outline-danger"
+              onClick={() => deleteUser(user)}
+            >
+              Delete
+            </div>
+          </li>
         ))}
       </ul>
     </>
